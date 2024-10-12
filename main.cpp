@@ -8,10 +8,23 @@ const int WINDOW_HEIGHT = 512;
 SDL_Window* g_main_window;
 SDL_Renderer* g_main_renderer;
 
-//Player
+// Player
 float px, py; // Position
 float PLAYER_SPEED = 8.0f; // Speed
 const float PLAYER_SIZE = 8.0f; // Size
+
+// Map
+int mapX = 8, mapY = 8, mapS = 64;
+int map[] = {
+    1,1,1,1,1,1,1,1,
+    1,0,1,0,0,0,0,1,
+    1,0,1,0,0,0,0,1,
+    1,0,1,0,0,1,0,1,
+    1,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,1,
+    1,0,0,0,0,0,0,1,
+    1,1,1,1,1,1,1,1
+};
 
 static bool Init() {
     if (SDL_Init(SDL_INIT_EVERYTHING) > 0) {
@@ -59,6 +72,7 @@ static void ClearScreen(SDL_Renderer* renderer) {
     SDL_RenderClear(renderer);
 }
 
+#pragma region PLAYER
 void drawPlayer(SDL_Renderer* renderer) {
      SDL_SetRenderDrawColor(renderer, Colors::YELLOW.r, Colors::YELLOW.g, Colors::YELLOW.b, Colors::YELLOW.a);
 
@@ -85,7 +99,30 @@ void handlePlayerMovement(SDL_Scancode keyPressed) {
         py += std::min(PLAYER_SPEED, WINDOW_HEIGHT - (py + PLAYER_SIZE));
     }
 }
+#pragma endregion
+    
 
+#pragma region MAP
+void drawMap2D() {
+    int x, y, xo, yo;
+
+    for (y = 0; y < mapY; y++) {
+        for (x = 0; x < mapX; x++) {
+            xo = x * mapS;
+            yo = y * mapS;
+
+            if (map[y * mapX + x] == 1) {
+                SDL_SetRenderDrawColor(g_main_renderer, Colors::WHITE.r, Colors::WHITE.g, Colors::WHITE.b, Colors::WHITE.a);
+            } else {
+                SDL_SetRenderDrawColor(g_main_renderer, Colors::BLACK.r, Colors::BLACK.g, Colors::BLACK.b, Colors::BLACK.a);
+            }
+
+            SDL_Rect rect = { xo, yo, mapS - 1, mapS - 1};
+            SDL_RenderFillRect(g_main_renderer, &rect);
+        }
+    }
+}
+#pragma endregion
 int main() {
     if (!Init()) {
         Shutdown();
@@ -98,6 +135,7 @@ int main() {
 
     while (running) {
         ClearScreen(g_main_renderer);
+        drawMap2D();
         drawPlayer(g_main_renderer);
         // Check and process I/O Events
         if (SDL_PollEvent(&event)) {

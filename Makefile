@@ -6,18 +6,20 @@ LDFLAGS = -L/opt/homebrew/lib -lSDL2
 # Output executable
 TARGET = main
 
-# Object files
-OBJ = main.o
+# Source and object files
+SRC  = $(wildcard src/**/*.cpp) $(wildcard src/*.cpp)
+OBJ  = $(SRC:.cpp=.o)
 
-# Build the executable
+# Default target
 all: $(TARGET)
 
+# Build the executable
 $(TARGET): $(OBJ)
 	$(CXX) $(OBJ) -o $(TARGET) $(LDFLAGS)
 
-# Compile the source files
-$(OBJ): main.cpp
-	$(CXX) $(CXXFLAGS) -c main.cpp -o $(OBJ)
+# Compile each source file to an object file
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Clean up generated files
 clean:

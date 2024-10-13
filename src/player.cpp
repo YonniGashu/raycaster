@@ -1,7 +1,7 @@
 #include <iostream>
-#include "player.h"
-#include "colors.h"
-#include "config.h"
+#include "player.hpp"
+#include "colors.hpp"
+#include "config.hpp"
 
 Player::Player(float startX, float startY, float playerSpeed, float playerSize)
     : px(startX), py(startY), PLAYER_SPEED(playerSpeed), PLAYER_SIZE(playerSize) {

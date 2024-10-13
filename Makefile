@@ -1,29 +1,27 @@
-# Compiler and flags
 CXX = clang++
 CXXFLAGS = -Wall -I/opt/homebrew/include/SDL2
 LDFLAGS = -L/opt/homebrew/lib -lSDL2
 
-# Output executable
-TARGET = main
+SRC  = $(wildcard src/**.cpp)
+OBJ  = $(patsubst %.cpp, $(BIN)/%.o, $(SRC))
+BIN = bin
 
-# Source and object files
-SRC  = $(wildcard src/**/*.cpp) $(wildcard src/*.cpp)
-OBJ  = $(SRC:.cpp=.o)
+all: dirs game
 
-# Default target
-all: $(TARGET)
+dirs:
+	mkdir -p $(BIN)
+	mkdir -p $(BIN)/src
 
-# Build the executable
-$(TARGET): $(OBJ)
-	$(CXX) $(OBJ) -o $(TARGET) $(LDFLAGS)
+run: all
+	$(BIN)/game
 
-# Compile each source file to an object file
-%.o: %.cpp
+game: $(OBJ)
+	$(CXX) -o $(BIN)/game $^ $(LDFLAGS)
+
+$(BIN)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Clean up generated files
 clean:
-	rm -f $(OBJ) $(TARGET)
+	rm -rf $(BIN)
 
-# Rebuild everything
 rebuild: clean all

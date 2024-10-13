@@ -1,5 +1,5 @@
-#include "map.h"
-#include "colors.h"
+#include "map.hpp"
+#include "colors.hpp"
 #include <SDL.h>
 
 const int mapX = 8;

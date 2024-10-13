@@ -1,9 +1,9 @@
 #include <iostream>
 #include <SDL.h>
-#include "colors.h"
-#include "config.h"
-#include "player.h"
-#include "map.h"
+#include "colors.hpp"
+#include "config.hpp"
+#include "player.hpp"
+#include "map.hpp"
 
 // Window Properties
 const int WINDOW_WIDTH = 1024;
@@ -54,16 +54,13 @@ static void ClearScreen(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, Colors::GRAY.r, Colors::GRAY.g, Colors::GRAY.b, Colors::GRAY.a);
     SDL_RenderClear(renderer);
 }
-    
-
 
 int main() {
     if (!Init()) {
         Shutdown();
         return EXIT_FAILURE;
     }
-    
-    // Draw loop
+
     Player player(300, 300, 8, 8);
     SDL_Event event;
     bool running = true;

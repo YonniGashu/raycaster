@@ -70,6 +70,7 @@ int main() {
 
         drawMap2D(g_main_renderer);
         player.drawPlayer(g_main_renderer);
+        player.drawRays2D(g_main_renderer);
 
         if (SDL_PollEvent(&event)) {
             switch (event.type) {

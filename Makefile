@@ -8,6 +8,14 @@ BIN = bin
 
 all: dirs game
 
+libs:
+	brew install sdl2
+	@echo "Compilation flags for SDL2:"
+	@sdl2-config --cflags
+	@echo "Linker flags for SDL2:"
+	@sdl2-config --libs
+	@echo "These flags are what you should update in the CXXFLAGS and LDFLAGS sections of the Makefile."
+	
 dirs:
 	mkdir -p $(BIN)
 	mkdir -p $(BIN)/src

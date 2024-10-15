@@ -7,17 +7,12 @@ Raycaster made in C++
 ##### Unix-like
 
 `$ https://github.com/YonniGashu/raycaster.git`\
+`$ make libs`\
 `$ make`
 
-Be sure that you have SDL2 installed, that is the only library required:
+Running `$ make libs` will ensure that you have SDL2 installed.
 
-`brew install sdl2`
-
-If needed, replace the FLAGS in the Makefile with the correct paths on your system.
-You can find these paths by running:
-
-`sdl2-config --cflags`\
-`sdl2-config --libs`
+It will also list out the flags that you should update in the CXXFLAGS and LDFLAGS sections of the Makefile before running.
 
 The game binary, once built with `$ make`, can be found in `./bin/`.
 

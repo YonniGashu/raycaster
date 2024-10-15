@@ -134,16 +134,16 @@ void Player::drawRays2D(SDL_Renderer* renderer) {
             }
         }
         if (disV < disH) 
-        { rx = vx; ry = vy; disT = disV; SDL_SetRenderDrawColor(renderer, Colors::VRED.r, Colors::VRED.g, Colors::VRED.b, Colors::VRED.a);} 
+        { rx = vx; ry = vy; disT = disV; SDL_SetRenderDrawColor(renderer, Colors::V.r, Colors::V.g, Colors::V.b, Colors::V.a);} 
         else 
-        { rx = hx; ry = hy; disT = disH; SDL_SetRenderDrawColor(renderer, Colors::HRED.r, Colors::HRED.g, Colors::HRED.b, Colors::HRED.a);} // different colors allow for V and H => easy shading
+        { rx = hx; ry = hy; disT = disH; SDL_SetRenderDrawColor(renderer, Colors::H.r, Colors::H.g, Colors::H.b, Colors::H.a);} // different colors allow for V and H => easy shading
 
         SDL_RenderDrawLineF(renderer, px + PLAYER_SIZE / 2, py + PLAYER_SIZE / 2, rx, ry);
         //---Draw 3D Walls---
         float ca=pa-ra; if (ca < 0) { ca += 2 * PI; } if (ca > 2 * PI) { ca -= 2 * PI; } disT = disT * cos(ca); // fix fisheye
         float lineHeight = (mapS*320)/disT; if (lineHeight > 320) { lineHeight = 320; } // set line height based on distance
         float lineOffset = 160-lineHeight/2;
-        SDL_FRect rect = { r * 8 + 530, lineOffset, 8, lineHeight+lineOffset };SDL_RenderFillRectF(renderer, &rect);
+        SDL_FRect rect = { r * 8 + 530, lineOffset, 8, lineHeight+lineOffset };SDL_RenderFillRectF(renderer, &rect); // draw the rectangles
         ra += DR; if (ra < 0) ra += 2 * PI; if (ra > 2 * PI) ra -= 2 * PI;
     }
 }

@@ -20,7 +20,9 @@ void Player::drawPlayer(SDL_Renderer* renderer) {
 }
 
 void Player::handlePlayerMovement(SDL_Scancode keyPressed) {
-    if (keyPressed == SDL_SCANCODE_D) {
+    const Uint8* keyState = SDL_GetKeyboardState(NULL); // Get the current key state
+
+    if (keyState[SDL_SCANCODE_D]) {
         pa += 0.1;
         if (pa > 2 * PI) {
             pa -= 2 * PI;
@@ -28,7 +30,7 @@ void Player::handlePlayerMovement(SDL_Scancode keyPressed) {
         pdx = cos(pa) * 5;
         pdy = sin(pa) * 5;
     }
-    if (keyPressed == SDL_SCANCODE_A) {
+    if (keyState[SDL_SCANCODE_A]) {
         pa -= 0.1;
         if (pa < 0) {
             pa += 2 * PI;
@@ -36,11 +38,11 @@ void Player::handlePlayerMovement(SDL_Scancode keyPressed) {
         pdx = cos(pa) * 5;
         pdy = sin(pa) * 5;
     }
-    if (keyPressed == SDL_SCANCODE_W) {
+    if (keyState[SDL_SCANCODE_W]) {
         py += pdy;
         px += pdx;
     }
-    if (keyPressed == SDL_SCANCODE_S) {
+    if (keyState[SDL_SCANCODE_S]) {
         py -= pdy;
         px -= pdx;
     }

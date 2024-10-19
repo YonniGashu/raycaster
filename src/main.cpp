@@ -61,7 +61,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    Player player(300, 300, 8, 8);
+    Player player(300, 300, 1.5, 8);
     SDL_Event event;
     bool running = true;
 
@@ -70,12 +70,12 @@ int main() {
 
         drawMap2D(g_main_renderer);
         player.drawPlayer(g_main_renderer);
+        player.handlePlayerMovement();
         player.drawRays2D(g_main_renderer);
 
         if (SDL_PollEvent(&event)) {
             switch (event.type) {
             case SDL_KEYDOWN:
-                player.handlePlayerMovement(event.key.keysym.scancode);
                 running = event.key.keysym.scancode != SDL_SCANCODE_ESCAPE;
                 break;
             case SDL_QUIT:

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "player.hpp"
 #include "map.hpp"
+#include "texture.hpp"
 #include "colors.hpp"
 #include "config.hpp"
 
@@ -31,18 +32,14 @@ void Player::handlePlayerMovement() {
 
     //---HANDLE TURNING---
     if (keyState[SDL_SCANCODE_D]) {
-        playerAngle += 0.05;
-        if (playerAngle > 2 * PI) {
-            playerAngle -= 2 * PI;
-        }
+        playerAngle = fixAngle(playerAngle + 0.05);
+
         playerDeltaX = cos(playerAngle) * 5;
         playerDeltaY = sin(playerAngle) * 5;
     }
     if (keyState[SDL_SCANCODE_A]) {
-        playerAngle -= 0.05;
-        if (playerAngle < 0) {
-            playerAngle += 2 * PI;
-        }
+        playerAngle = fixAngle(playerAngle - 0.05);
+
         playerDeltaX = cos(playerAngle) * 5;
         playerDeltaY = sin(playerAngle) * 5;
     }
@@ -68,70 +65,76 @@ void Player::handlePlayerMovement() {
     int ipy_sub_yo = (playerY - yOffset) / 64.0; // player grid position, +/- y-offset
 
     if (keyState[SDL_SCANCODE_W]) {
-        if (map[ipy * mapX + ipx_add_xo] == 0) { 
+        if (mapW[ipy * mapX + ipx_add_xo] == 0) { 
             playerX += playerDeltaX * deltaTime * 30.0f; 
         }
-        if (map[ipy_add_yo * mapX + ipx] == 0) { 
+        if (mapW[ipy_add_yo * mapX + ipx] == 0) { 
             playerY += playerDeltaY * deltaTime * 30.0f;
         }   
     }
 
     if (keyState[SDL_SCANCODE_S]) {
-       if (map[ipy * mapX + ipx_sub_xo] == 0) { 
+       if (mapW[ipy * mapX + ipx_sub_xo] == 0) { 
             playerX -= playerDeltaX * deltaTime * 30.0f; 
         }
-        if (map[ipy_sub_yo * mapX + ipx] == 0) { 
+        if (mapW[ipy_sub_yo * mapX + ipx] == 0) { 
             playerY -= playerDeltaY * deltaTime * 30.0f;
         }
     }
 }
 
-float dist(float ax, float ay, float bx, float by, float ang) {
-    return ( sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay))  );
-}
-
 void Player::drawRays2D(SDL_Renderer* renderer) {
-    int r, mx, my, mp, dof;
-    float rx, ry, ra, xo, yo, disT;
-    ra = playerAngle - DR*30; // Ray angle = Player angle - 30 degrees
-    // Normalize the angle
-    if (ra < 0) ra += 2 * PI;
-    if (ra > 2 * PI) ra -= 2 * PI;
+    int mx, my, mp, dof;
+    float rayX, rayY, rayAngle, xOffset, yOffset, disT;
+    rayAngle = fixAngle(playerAngle - DR * 30); // Ray angle = Player angle - 30 degrees
 
-    for (r = 0; r < 60; r++) {
+    for (int r = 0; r < 60; r++) {
+        // Vertical and Horizontal Map Texture Number
+        int vmt = 0;
+        int hmt = 0;
+
         // --- Horizontal Line Checks ---
         dof = 0;
-        float disH = 1000000, hx = playerX, hy = playerY;
-        float aTan = -1 / tan(ra);
-        if (ra > PI) { // Looking up
-            ry = (((int)playerY >> 6) << 6) - 0.0001;
-            rx = (playerY - ry) * aTan + playerX;
-            yo = -64;
-            xo = -yo * aTan;
+        float disH = 1000000;
+        float hx = playerX;
+        float hy = playerY;
+        float aTan = -1 / tan(rayAngle);
+
+        // Looking up
+        if (rayAngle > PI) { 
+            rayY = (((int)playerY >> 6) << 6) - 0.0001;
+            rayX = (playerY - rayY) * aTan + playerX;
+            yOffset = -64;
+            xOffset = -yOffset * aTan;
         } 
-        if (ra < PI) { // Looking down
-            ry = (((int)playerY >> 6) << 6) + 64;
-            rx = (playerY - ry) * aTan + playerX;
-            yo = 64;
-            xo = -yo * aTan;
+
+        // Looking down
+        if (rayAngle < PI) { 
+            rayY = (((int)playerY >> 6) << 6) + 64;
+            rayX = (playerY - rayY) * aTan + playerX;
+            yOffset = 64;
+            xOffset = -yOffset * aTan;
         } 
-        if (ra == PI || ra == 0) { // Looking straight left or right
-            rx = playerX;
-            ry = playerY;
+
+        // Looking straight left or right
+        if (rayAngle == PI || rayAngle == 0) { 
+            rayX = playerX;
+            rayY = playerY;
             dof = 8; // Skip further checks
         }
         while (dof < 8) {
-            mx = (int)(rx) >> 6;
-            my = (int)(ry) >> 6;
+            mx = (int)(rayX) >> 6;
+            my = (int)(rayY) >> 6;
             mp = my * mapX + mx;
-            if (mp > 0 && mp < mapX * mapY && map[mp] == 1) { // Hit a horizontal wall
-                hx = rx;
-                hy = ry;
-                disH = dist(playerX, playerY, hx, hy, ra);
+            if (mp > 0 && mp < mapX * mapY && mapW[mp] > 0) { // Hit a horizontal wall
+                hmt = mapW[mp] - 1;
+                hx = rayX;
+                hy = rayY;
+                disH = dist(playerX, playerY, hx, hy, rayAngle);
                 dof = 8;
             } else {
-                rx += xo;
-                ry += yo;
+                rayX += xOffset;
+                rayY += yOffset;
                 dof += 1;
             }
         }
@@ -139,51 +142,132 @@ void Player::drawRays2D(SDL_Renderer* renderer) {
         // --- Vertical Line Checks ---
         dof = 0;
         float disV=1000000, vx=playerX, vy=playerY;
-        float nTan = -tan(ra);
-        if (ra > P2 && ra < P3) { // Looking left
-            rx = (((int)playerX >> 6) << 6) - 0.0001;
-            ry = (playerX - rx) * nTan + playerY;
-            xo = -64;
-            yo = -xo * nTan;
+        float nTan = -tan(rayAngle);
+
+        // Looking left
+        if (rayAngle > P2 && rayAngle < P3) { 
+            rayX = (((int)playerX >> 6) << 6) - 0.0001;
+            rayY = (playerX - rayX) * nTan + playerY;
+            xOffset = -64;
+            yOffset = -xOffset * nTan;
         } 
-        if (ra < P2 || ra > P3) { // Looking right
-            rx = (((int)playerX >> 6) << 6) + 64;
-            ry = (playerX - rx) * nTan + playerY;
-            xo = 64;
-            yo = -xo * nTan;
+
+        // Looking right
+        if (rayAngle < P2 || rayAngle > P3) { 
+            rayX = (((int)playerX >> 6) << 6) + 64;
+            rayY = (playerX - rayX) * nTan + playerY;
+            xOffset = 64;
+            yOffset = -xOffset * nTan;
         } 
-        if (ra == 0 || ra == PI) { // Looking straight up or down
-            rx = playerX;
-            ry = playerY;
+
+        // Looking straight up or down
+        if (rayAngle == 0 || rayAngle == PI) { 
+            rayX = playerX;
+            rayY = playerY;
             dof = 8; // Skip further checks
         }
 
         while (dof < 8) {
-            mx = (int)(rx) >> 6;
-            my = (int)(ry) >> 6;
+            mx = (int)(rayX) >> 6;
+            my = (int)(rayY) >> 6;
             mp = my * mapX + mx;
-            if (mp > 0 && mp < mapX * mapY && map[mp] == 1) { // Hit a vertical wall
-                vx = rx;
-                vy = ry;
-                disV = dist(playerX, playerY, vx, vy, ra);
+
+            // Hit a vertical wall
+            if (mp > 0 && mp < mapX * mapY && mapW[mp] > 0) { 
+                vmt = mapW[mp] - 1;
+                vx = rayX;
+                vy = rayY;
+                disV = dist(playerX, playerY, vx, vy, rayAngle);
                 dof = 8;
             } else {
-                rx += xo;
-                ry += yo;
+                rayX += xOffset;
+                rayY += yOffset;
                 dof += 1;
             }
         }
-        if (disV < disH) 
-        { rx = vx; ry = vy; disT = disV; SDL_SetRenderDrawColor(renderer, Colors::V.r, Colors::V.g, Colors::V.b, Colors::V.a);} 
-        else 
-        { rx = hx; ry = hy; disT = disH; SDL_SetRenderDrawColor(renderer, Colors::H.r, Colors::H.g, Colors::H.b, Colors::H.a);} // different colors allow for V and H => easy shading
+        float shade = 1;
+        if (disV < disH) { 
+            hmt = vmt;
+            shade = 0.5f;
+            rayX = vx; 
+            rayY = vy; 
+            disT = disV; 
+            SDL_SetRenderDrawColor(renderer, Colors::V.r, Colors::V.g, Colors::V.b, Colors::V.a);} 
+        else {
+            rayX = hx; 
+            rayY = hy; 
+            disT = disH; 
+            SDL_SetRenderDrawColor(renderer, Colors::H.r, Colors::H.g, Colors::H.b, Colors::H.a); // different colors allow for V and H => easy shading
+            } 
+        SDL_RenderDrawLineF(renderer, playerX + PLAYER_SIZE / 2, playerY + PLAYER_SIZE / 2, rayX, rayY);
 
-        SDL_RenderDrawLineF(renderer, playerX + PLAYER_SIZE / 2, playerY + PLAYER_SIZE / 2, rx, ry);
-        //---Draw 3D Walls---
-        float ca=playerAngle-ra; if (ca < 0) { ca += 2 * PI; } if (ca > 2 * PI) { ca -= 2 * PI; } disT = disT * cos(ca); // fix fisheye
-        float lineHeight = (mapS*320)/disT; if (lineHeight > 320) { lineHeight = 320; } // set line height based on distance
-        float lineOffset = 160-lineHeight/2;
-        SDL_FRect rect = { r * 8 + 530, lineOffset, 8, lineHeight+lineOffset };SDL_RenderFillRectF(renderer, &rect); // draw the rectangles
-        ra += DR; if (ra < 0) ra += 2 * PI; if (ra > 2 * PI) ra -= 2 * PI;
+        // --- Draw 3D Walls ---
+        float ca = fixAngle(playerAngle - rayAngle);
+        disT = disT * cos(ca); // fix fisheye
+
+        float lineHeight = (mapS * 320) / disT; 
+        float textureY_Step = 32.0 / (float) lineHeight;
+        float textureY_Offset = 0;
+
+        if (lineHeight > 320) {
+            textureY_Offset = (lineHeight - 320) / 2.0;
+            lineHeight = 320; // set line height based on distance
+        }
+        float lineOffset = 160 - lineHeight / 2;
+ 
+        float textureY = textureY_Offset * textureY_Step + hmt * 32;
+        float textureX;
+
+        if (shade == 1) {
+            textureX = (int) (rayX / 2.0) % 32;
+            if (rayAngle > PI) {
+                textureX = 31 - textureX;
+            }
+        } else {
+            textureX = (int) (rayY / 2.0) % 32;
+            if (rayAngle > PI / 2 && rayAngle < 3 * PI / 2) {
+                textureX = 31 - textureX;
+            }
+        }
+
+        for (int y = 0; y < lineHeight; y++) {
+            float c = All_Textures[(int) (textureY) * 32 + (int) (textureX)] * shade;
+            SDL_SetRenderDrawColor(renderer, (Uint8) (c * 255), (Uint8) (c * 255), (Uint8) (c * 255), SDL_ALPHA_OPAQUE);
+            SDL_FRect rect = { r * 8 + 530, y + lineOffset, 8, lineHeight + lineOffset };
+            SDL_RenderFillRectF(renderer, &rect); 
+            textureY += textureY_Step;
+        }
+
+        rayAngle = fixAngle(rayAngle + DR);
     }
+}
+
+// --- HELPER METHODS ---
+float dist(float ax, float ay, float bx, float by, float ang) {
+    return ( sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay))  );
+}
+
+void printRenderDrawColor(SDL_Renderer* renderer) {
+    Uint8 r, g, b, a;
+    if (SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a) == 0) {
+        std::cout << "Renderer draw color - "
+                  << "Red: " << static_cast<int>(r) << ", "
+                  << "Green: " << static_cast<int>(g) << ", "
+                  << "Blue: " << static_cast<int>(b) << ", "
+                  << "Alpha: " << static_cast<int>(a) << std::endl;
+    } else {
+        std::cerr << "Failed to get render draw color: " << SDL_GetError() << std::endl;
+    }
+}
+
+float fixAngle(float ang) {
+    if (ang < 0) {
+        ang += 2 *PI;
+    }
+
+    if (ang > 2 * PI) {
+        ang -= 2 * PI;
+    }
+
+    return ang;
 }

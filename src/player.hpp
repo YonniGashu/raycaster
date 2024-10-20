@@ -5,6 +5,10 @@
 #define P3 3 * PI/2
 #define DR 0.0174533 // one degree in radians
 
+float fixAngle(float ang);
+float dist(float ax, float ay, float bx, float by, float ang);
+void printRenderDrawColor(SDL_Renderer* renderer);
+
 class Player {
 public:
     Player(float startX, float startY, float playerSpeed, float playerSize);

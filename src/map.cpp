@@ -6,7 +6,7 @@ const int mapX = 8;
 const int mapY = 8;
 const int mapS = 64;
 
-int map[] = {
+int mapW[] = {
     1,1,1,1,1,1,1,1,
     1,0,0,0,0,0,0,1,
     1,0,1,0,0,1,1,1,
@@ -26,7 +26,7 @@ void drawMap2D(SDL_Renderer* renderer) {
             xo = x * mapS;
             yo = y * mapS;
 
-            if (map[y * mapX + x] == 1) {
+            if (mapW[y * mapX + x] > 0) {
                 SDL_SetRenderDrawColor(renderer, Colors::WHITE.r, Colors::WHITE.g, Colors::WHITE.b, Colors::WHITE.a);
             } else {
                 SDL_SetRenderDrawColor(renderer, Colors::BLACK.r, Colors::BLACK.g, Colors::BLACK.b, Colors::BLACK.a);

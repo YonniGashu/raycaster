@@ -20,4 +20,4 @@ _Be sure_ to run with `$ ./bin/game` out of the root directory of the repository
 
 ##### Windows
 
-good luck 🤷‍♂️
+good luck 🤷🏾‍♂️

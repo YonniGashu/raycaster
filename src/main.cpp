@@ -1,15 +1,17 @@
-#include <iostream>
 #include <SDL.h>
+
+#include <iostream>
+
 #include "colors.hpp"
 #include "config.hpp"
-#include "player.hpp"
 #include "map.hpp"
+#include "player.hpp"
 
 // Window Properties
 const int WINDOW_WIDTH = 1024;
 const int WINDOW_HEIGHT = 512;
-SDL_Window* g_main_window;
-SDL_Renderer* g_main_renderer;
+SDL_Window *g_main_window;
+SDL_Renderer *g_main_renderer;
 
 static bool Init() {
     if (SDL_Init(SDL_INIT_EVERYTHING) > 0) {
@@ -22,8 +24,7 @@ static bool Init() {
         SDL_WINDOWPOS_CENTERED,
         WINDOW_WIDTH,
         WINDOW_HEIGHT,
-        SDL_WINDOW_OPENGL
-    );
+        SDL_WINDOW_OPENGL);
 
     if (g_main_window == nullptr) {
         std::cout << "Unable to create the main. Error: " << SDL_GetError() << std::endl;
@@ -46,11 +47,11 @@ void Shutdown() {
         SDL_DestroyRenderer(g_main_renderer);
         g_main_renderer = nullptr;
     }
-    
+
     SDL_Quit();
 }
 
-static void ClearScreen(SDL_Renderer* renderer) {
+static void ClearScreen(SDL_Renderer *renderer) {
     SDL_SetRenderDrawColor(renderer, Colors::GRAY.r, Colors::GRAY.g, Colors::GRAY.b, Colors::GRAY.a);
     SDL_RenderClear(renderer);
 }
@@ -66,25 +67,26 @@ int main() {
     bool running = true;
 
     while (running) {
-        ClearScreen(g_main_renderer);
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+                case SDL_KEYDOWN:
+                    player.handlePlayerInteractions(event.key.keysym.scancode);
+                    running = event.key.keysym.scancode != SDL_SCANCODE_ESCAPE;
+                    break;
+                case SDL_QUIT:
+                    running = false;
+                    break;
+                default:
+                    break;
+            }
+        }
 
+        ClearScreen(g_main_renderer);
         drawMap2D(g_main_renderer);
         player.drawPlayer(g_main_renderer);
         player.handlePlayerMovement();
         player.drawRays2D(g_main_renderer);
 
-        if (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_KEYDOWN:
-                running = event.key.keysym.scancode != SDL_SCANCODE_ESCAPE;
-                break;
-            case SDL_QUIT:
-                running = false;
-                break;
-            default:
-                break;
-            }
-        }
         SDL_RenderPresent(g_main_renderer);
     }
 

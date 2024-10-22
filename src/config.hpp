@@ -6,5 +6,4 @@
 extern const int WINDOW_WIDTH;
 extern const int WINDOW_HEIGHT;
 
-
-#endif // CONFIG_H
+#endif  // CONFIG_H

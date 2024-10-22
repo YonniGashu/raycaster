@@ -283,20 +283,28 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
             textureY += textureY_Step;
         }
 
-        // --- Draw Floors ---
+        // --- Draw Floors & Ceiling---
         for (int y = lineOffset + lineHeight; y < 320; y++) {
             float deltaY = y - (320 / 2.0f);
             float deg = rayAngle;
             float rayAngleFix = cos(fixAngle(playerAngle - rayAngle));
 
             textureX = playerX / 2 + cos(deg) * 158 * 32 / deltaY / rayAngleFix;
-            textureY = playerY / 2 - sin(deg) * 158 * 32 / deltaY / rayAngleFix;
+            textureY = playerY / 2 + sin(deg) * 158 * 32 / deltaY / rayAngleFix;
 
-            float c = All_Textures[((int)(textureY) & 31) * 32 + ((int)(textureX) & 31)] * 0.7f;
-            SDL_SetRenderDrawColor(renderer, (Uint8)(c * 255), (Uint8)(c * 255), (Uint8)(c * 255), SDL_ALPHA_OPAQUE);
-
+            // FLOORS
+            int mp = mapF[(int)(textureY / 32.0) * mapX + (int)(textureX / 32.0)] * 32 * 32;
+            float c = All_Textures[((int)(textureY) & 31) * 32 + ((int)(textureX) & 31) + mp] * 0.7f;
+            SDL_SetRenderDrawColor(renderer, (Uint8)(c * 255 / 2), (Uint8)(c * 255 / 2), (Uint8)(c * 255), SDL_ALPHA_OPAQUE);
             SDL_FRect rect = {r * 8 + 530, y, 8, 1};
             SDL_RenderFillRectF(renderer, &rect);
+
+            // CEILINGS
+            mp = mapC[(int)(textureY / 32.0) * mapX + (int)(textureX / 32.0)] * 32 * 32;
+            c = All_Textures[((int)(textureY) & 31) * 32 + ((int)(textureX) & 31) + mp] * 0.7f;
+            SDL_SetRenderDrawColor(renderer, (Uint8)(c * 255 / 2), (Uint8)(c * 255), (Uint8)(c * 255 / 2), SDL_ALPHA_OPAQUE);
+            SDL_FRect rectC = {r * 8 + 530, 320 - y, 8, 1};
+            SDL_RenderFillRectF(renderer, &rectC);
         }
 
         rayAngle = fixAngle(rayAngle + DR);

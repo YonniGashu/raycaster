@@ -108,7 +108,7 @@ void Player::handlePlayerInteractions(SDL_Scancode keyPressed) {
         int ipy_add_yo = (playerY + yOffset) / 64.0;
 
         // IF IN RANGE OF A DOOR, OPEN IT WHEN E IS PRESSED
-        if (mapW[ipy_add_yo * mapX + ipx_add_xo] == 4) {
+        if (mapW[ipy_add_yo * mapX + ipx_add_xo] == 2) {
             mapW[ipy_add_yo * mapX + ipx_add_xo] = 0;
         }
     }
@@ -247,7 +247,7 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
 
         int lineOffset = 160 - (lineHeight >> 1);
 
-        float textureY = textureY_Offset * textureY_Step + hmt * 32;
+        float textureY = textureY_Offset * textureY_Step;  // + hmt * 32;
         float textureX;
 
         if (shade == 1) {
@@ -263,22 +263,12 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
         }
 
         for (int y = 0; y < lineHeight; y++) {
-            float c = All_Textures[(int)(textureY) * 32 + (int)(textureX)] * shade;
-            switch (hmt) {
-                case 0:  // Checkerboard Red
-                    SDL_SetRenderDrawColor(renderer, (Uint8)(c * 255), (Uint8)(c * 255) / 2, (Uint8)(c * 255) / 2, SDL_ALPHA_OPAQUE);
-                    break;
-                case 1:  // Brick Yellow
-                    SDL_SetRenderDrawColor(renderer, (Uint8)(c * 255), (Uint8)(c * 255), (Uint8)(c * 255) / 2, SDL_ALPHA_OPAQUE);
-                    break;
-                case 2:  // Window Purple
-                    SDL_SetRenderDrawColor(renderer, (Uint8)(c * 255), (Uint8)(c * 255) / 2, (Uint8)(c * 255), SDL_ALPHA_OPAQUE);
-                    break;
-                case 3:  // Door Green
-                    SDL_SetRenderDrawColor(renderer, (Uint8)(c * 255) / 2, (Uint8)(c * 255), (Uint8)(c * 255) / 2, SDL_ALPHA_OPAQUE);
-                    break;
-            }
-            SDL_FRect rect = {r * 8 + 530, y + lineOffset, 8, 1};
+            int pixel = ((int)textureY * 32 + (int)textureX) * 3 + (hmt * 32 * 32 * 3);
+            int red = All_Textures[pixel + 0] * shade;
+            int green = All_Textures[pixel + 1] * shade;
+            int blue = All_Textures[pixel + 2] * shade;
+            SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
+            SDL_FRect rect = {r * 8 + 530, y + lineOffset, 8, 8};
             SDL_RenderFillRectF(renderer, &rect);
             textureY += textureY_Step;
         }
@@ -294,15 +284,21 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
 
             // FLOORS
             int mp = mapF[(int)(textureY / 32.0) * mapX + (int)(textureX / 32.0)] * 32 * 32;
-            float c = All_Textures[((int)(textureY) & 31) * 32 + ((int)(textureX) & 31) + mp] * 0.7f;
-            SDL_SetRenderDrawColor(renderer, (Uint8)(c * 255 / 2), (Uint8)(c * 255 / 2), (Uint8)(c * 255), SDL_ALPHA_OPAQUE);
-            SDL_FRect rect = {r * 8 + 530, y, 8, 1};
+            int pixel = (((int)(textureY) & 31) * 32 + ((int)(textureX) & 31)) * 3 + mp * 3;
+            int red = All_Textures[pixel + 0];
+            int green = All_Textures[pixel + 1];
+            int blue = All_Textures[pixel + 2];
+            SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
+            SDL_FRect rect = {r * 8 + 530, y, 8, 8};
             SDL_RenderFillRectF(renderer, &rect);
 
             // CEILINGS
             mp = mapC[(int)(textureY / 32.0) * mapX + (int)(textureX / 32.0)] * 32 * 32;
-            c = All_Textures[((int)(textureY) & 31) * 32 + ((int)(textureX) & 31) + mp] * 0.7f;
-            SDL_SetRenderDrawColor(renderer, (Uint8)(c * 255 / 2), (Uint8)(c * 255), (Uint8)(c * 255 / 2), SDL_ALPHA_OPAQUE);
+            pixel = (((int)(textureY) & 31) * 32 + ((int)(textureX) & 31)) * 3 + mp * 3;
+            red = All_Textures[pixel + 0];
+            green = All_Textures[pixel + 1];
+            blue = All_Textures[pixel + 2];
+            SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
             SDL_FRect rectC = {r * 8 + 530, 320 - y, 8, 1};
             SDL_RenderFillRectF(renderer, &rectC);
         }

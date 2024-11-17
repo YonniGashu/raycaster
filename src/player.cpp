@@ -285,9 +285,9 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
             // FLOORS
             int mp = mapF[(int)(textureY / 32.0) * mapX + (int)(textureX / 32.0)] * 32 * 32;
             int pixel = (((int)(textureY) & 31) * 32 + ((int)(textureX) & 31)) * 3 + mp * 3;
-            int red = All_Textures[pixel + 0];
-            int green = All_Textures[pixel + 1];
-            int blue = All_Textures[pixel + 2];
+            int red = All_Textures[pixel + 0] * 0.7;
+            int green = All_Textures[pixel + 1] * 0.7;
+            int blue = All_Textures[pixel + 2] * 0.7;
             SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
             SDL_FRect rect = {r * 8 + 530, y, 8, 8};
             SDL_RenderFillRectF(renderer, &rect);
@@ -304,6 +304,25 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
         }
 
         rayAngle = fixAngle(rayAngle + DR);
+    }
+}
+
+void Player::drawSky(SDL_Renderer *renderer) {
+    for (int y = 0; y < 40; y++) {
+        for (int x = 0; x < 120; x++) {
+            int xo = (int)radToDeg(playerAngle) * 2 - x;
+            if (xo < 0) {
+                xo += 120;
+            }
+            xo = xo % 120;
+            int pixel = (y * 120 + xo) * 3;
+            int red = sky1[pixel + 0];
+            int green = sky1[pixel + 1];
+            int blue = sky1[pixel + 2];
+            SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
+            SDL_FRect rect = {x * 4 + 530, y * 4, 4, 4};
+            SDL_RenderFillRectF(renderer, &rect);
+        }
     }
 }
 

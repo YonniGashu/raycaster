@@ -17,6 +17,7 @@ class Player {
     void handlePlayerInteractions(SDL_Scancode keyPressed);
     void drawPlayer(SDL_Renderer *renderer);
     void drawRays2D(SDL_Renderer *renderer);
+    void drawSky(SDL_Renderer *renderer);
 
    private:
     float playerX, playerY, playerDeltaX, playerDeltaY, playerAngle;  // Position, deltaX, deltaY, and angle

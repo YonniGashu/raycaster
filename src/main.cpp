@@ -86,6 +86,7 @@ int main() {
         player.drawPlayer(g_main_renderer);
         player.handlePlayerMovement();
         player.drawRays2D(g_main_renderer);
+        player.drawSky(g_main_renderer);
 
         SDL_RenderPresent(g_main_renderer);
     }

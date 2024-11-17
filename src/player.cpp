@@ -309,25 +309,6 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
     }
 }
 
-void Player::drawSky(SDL_Renderer *renderer) {
-    for (int y = 0; y < 40; y++) {
-        for (int x = 0; x < 120; x++) {
-            int xo = (int)radToDeg(playerAngle) * .25 - x;
-            if (xo < 0) {
-                xo += 120;
-            }
-            xo = xo % 120;
-            int pixel = (y * 120 + xo) * 3;
-            int red = sky1[pixel + 0];
-            int green = sky1[pixel + 1];
-            int blue = sky1[pixel + 2];
-            SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
-            SDL_FRect rect = {x * 8, y * 8, 8, 8};
-            SDL_RenderFillRectF(renderer, &rect);
-        }
-    }
-}
-
 // --- HELPER METHODS ---
 float dist(float ax, float ay, float bx, float by, float ang) {
     return (sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)));

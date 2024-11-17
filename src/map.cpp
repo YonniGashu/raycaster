@@ -2,7 +2,8 @@
 
 #include <SDL.h>
 
-#include "colors.hpp"
+#include "player.hpp"
+#include "texture.hpp"
 
 const int mapX = 8;
 const int mapY = 8;
@@ -40,3 +41,22 @@ int mapC[] = {
     5, 5, 1, 2, 3, 5, 5, 5,
     5, 5, 5, 5, 5, 5, 5, 5,
     5, 5, 5, 5, 5, 5, 5, 5};
+
+void drawSky(SDL_Renderer *renderer, float playerAngle) {
+    for (int y = 0; y < 40; y++) {
+        for (int x = 0; x < 120; x++) {
+            int xo = (int)radToDeg(playerAngle) * .25 - x;
+            if (xo < 0) {
+                xo += 120;
+            }
+            xo = xo % 120;
+            int pixel = (y * 120 + xo) * 3;
+            int red = sky1[pixel + 0];
+            int green = sky1[pixel + 1];
+            int blue = sky1[pixel + 2];
+            SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
+            SDL_FRect rect = {x * 8, y * 8, 8, 8};
+            SDL_RenderFillRectF(renderer, &rect);
+        }
+    }
+}

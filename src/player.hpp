@@ -13,13 +13,13 @@ float radToDeg(float rad);
 class Player {
    public:
     Player(float startX, float startY, float playerSpeed, float playerSize);
+    float playerAngle;
     void handlePlayerMovement();
     void handlePlayerInteractions(SDL_Scancode keyPressed);
     void drawPlayer(SDL_Renderer *renderer);
     void drawRays2D(SDL_Renderer *renderer);
-    void drawSky(SDL_Renderer *renderer);
 
    private:
-    float playerX, playerY, playerDeltaX, playerDeltaY, playerAngle;  // Position, deltaX, deltaY, and angle
-    const float PLAYER_SIZE;                                          // Size
+    float playerX, playerY, playerDeltaX, playerDeltaY;  // Position, deltaX, deltaY, and angle
+    const float PLAYER_SIZE;                             // Size
 };

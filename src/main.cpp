@@ -83,9 +83,8 @@ int main() {
 
         ClearScreen(g_main_renderer);
         player.handlePlayerMovement();
-        player.drawSky(g_main_renderer);
+        drawSky(g_main_renderer, player.playerAngle);
         player.drawRays2D(g_main_renderer);
-
         SDL_RenderPresent(g_main_renderer);
     }
 

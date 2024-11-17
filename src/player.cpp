@@ -119,7 +119,7 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
     float rayX, rayY, rayAngle, xOffset, yOffset, disT;
     rayAngle = fixAngle(playerAngle - DR * 30);  // Ray angle = Player angle - 30 degrees
 
-    for (int r = 0; r < 60; r++) {
+    for (int r = 0; r < 120; r++) {
         // Vertical and Horizontal Map Texture Number
         int vmt = 0;
         int hmt = 0;
@@ -223,29 +223,29 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
             rayX = vx;
             rayY = vy;
             disT = disV;
-            SDL_SetRenderDrawColor(renderer, Colors::V.r, Colors::V.g, Colors::V.b, Colors::V.a);
+            // SDL_SetRenderDrawColor(renderer, Colors::V.r, Colors::V.g, Colors::V.b, Colors::V.a);
         } else {
             rayX = hx;
             rayY = hy;
             disT = disH;
-            SDL_SetRenderDrawColor(renderer, Colors::H.r, Colors::H.g, Colors::H.b, Colors::H.a);  // different colors allow for V and H => easy shading
+            // SDL_SetRenderDrawColor(renderer, Colors::H.r, Colors::H.g, Colors::H.b, Colors::H.a);  // different colors allow for V and H => easy shading
         }
-        SDL_RenderDrawLineF(renderer, playerX + PLAYER_SIZE / 2, playerY + PLAYER_SIZE / 2, rayX, rayY);
+        // SDL_RenderDrawLineF(renderer, playerX + PLAYER_SIZE / 2, playerY + PLAYER_SIZE / 2, rayX, rayY);
 
         // --- Draw 3D Walls ---
         float ca = fixAngle(playerAngle - rayAngle);
         disT = disT * cos(ca);  // fix fisheye
 
-        int lineHeight = (mapS * 320) / disT;
+        int lineHeight = (mapS * 640) / disT;
         float textureY_Step = 32.0 / (float)lineHeight;
         float textureY_Offset = 0;
 
-        if (lineHeight > 320) {
-            textureY_Offset = (lineHeight - 320) / 2.0;
-            lineHeight = 320;  // set line height based on distance
+        if (lineHeight > 640) {
+            textureY_Offset = (lineHeight - 640) / 2.0;
+            lineHeight = 640;  // set line height based on distance
         }
 
-        int lineOffset = 160 - (lineHeight >> 1);
+        int lineOffset = 320 - (lineHeight >> 1);
 
         float textureY = textureY_Offset * textureY_Step;  // + hmt * 32;
         float textureX;
@@ -268,19 +268,19 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
             int green = All_Textures[pixel + 1] * shade;
             int blue = All_Textures[pixel + 2] * shade;
             SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
-            SDL_FRect rect = {r * 8 + 530, y + lineOffset, 8, 8};
+            SDL_FRect rect = {r * 8, y + lineOffset, 8, 8};
             SDL_RenderFillRectF(renderer, &rect);
             textureY += textureY_Step;
         }
 
         // --- Draw Floors & Ceiling---
-        for (int y = lineOffset + lineHeight; y < 320; y++) {
-            float deltaY = y - (320 / 2.0f);
+        for (int y = lineOffset + lineHeight; y < 640; y++) {
+            float deltaY = y - (640 / 2.0f);
             float deg = rayAngle;
             float rayAngleFix = cos(fixAngle(playerAngle - rayAngle));
 
-            textureX = playerX / 2 + cos(deg) * 158 * 32 / deltaY / rayAngleFix;
-            textureY = playerY / 2 + sin(deg) * 158 * 32 / deltaY / rayAngleFix;
+            textureX = playerX / 2 + cos(deg) * 158 * 2 * 32 / deltaY / rayAngleFix;
+            textureY = playerY / 2 + sin(deg) * 158 * 2 * 32 / deltaY / rayAngleFix;
 
             // FLOORS
             int mp = mapF[(int)(textureY / 32.0) * mapX + (int)(textureX / 32.0)] * 32 * 32;
@@ -289,28 +289,30 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
             int green = All_Textures[pixel + 1] * 0.7;
             int blue = All_Textures[pixel + 2] * 0.7;
             SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
-            SDL_FRect rect = {r * 8 + 530, y, 8, 8};
+            SDL_FRect rect = {r * 8, y, 8, 8};
             SDL_RenderFillRectF(renderer, &rect);
 
             // CEILINGS
             mp = mapC[(int)(textureY / 32.0) * mapX + (int)(textureX / 32.0)] * 32 * 32;
-            pixel = (((int)(textureY) & 31) * 32 + ((int)(textureX) & 31)) * 3 + mp * 3;
-            red = All_Textures[pixel + 0];
-            green = All_Textures[pixel + 1];
-            blue = All_Textures[pixel + 2];
-            SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
-            SDL_FRect rectC = {r * 8 + 530, 320 - y, 8, 1};
-            SDL_RenderFillRectF(renderer, &rectC);
+            if (mp >= 0) {  // if mp == 0, we draw the sky
+                pixel = (((int)(textureY) & 31) * 32 + ((int)(textureX) & 31)) * 3 + mp * 3;
+                red = All_Textures[pixel + 0];
+                green = All_Textures[pixel + 1];
+                blue = All_Textures[pixel + 2];
+                SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
+                SDL_FRect rectC = {r * 8, 640 - y, 8, 1};
+                SDL_RenderFillRectF(renderer, &rectC);
+            }
         }
 
-        rayAngle = fixAngle(rayAngle + DR);
+        rayAngle = fixAngle(rayAngle + DR * .5);
     }
 }
 
 void Player::drawSky(SDL_Renderer *renderer) {
     for (int y = 0; y < 40; y++) {
         for (int x = 0; x < 120; x++) {
-            int xo = (int)radToDeg(playerAngle) * 2 - x;
+            int xo = (int)radToDeg(playerAngle) * .25 - x;
             if (xo < 0) {
                 xo += 120;
             }
@@ -320,7 +322,7 @@ void Player::drawSky(SDL_Renderer *renderer) {
             int green = sky1[pixel + 1];
             int blue = sky1[pixel + 2];
             SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
-            SDL_FRect rect = {x * 4 + 530, y * 4, 4, 4};
+            SDL_FRect rect = {x * 8, y * 8, 8, 8};
             SDL_RenderFillRectF(renderer, &rect);
         }
     }

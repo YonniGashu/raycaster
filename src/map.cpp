@@ -32,31 +32,11 @@ int mapF[] = {
 
 // CEILING MAP
 int mapC[] = {
-    5, 5, 5, 5, 5, 5, 5, 5,
-    5, 5, 5, 5, 5, 5, 5, 5,
+    -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1,
     5, 5, 5, 5, 5, 5, 5, 5,
     5, 5, 5, 5, 5, 5, 5, 5,
     5, 5, 5, 5, 5, 5, 5, 5,
     5, 5, 1, 2, 3, 5, 5, 5,
     5, 5, 5, 5, 5, 5, 5, 5,
     5, 5, 5, 5, 5, 5, 5, 5};
-
-void drawMap2D(SDL_Renderer* renderer) {
-    int x, y, xo, yo;
-
-    for (y = 0; y < mapY; y++) {
-        for (x = 0; x < mapX; x++) {
-            xo = x * mapS;
-            yo = y * mapS;
-
-            if (mapW[y * mapX + x] > 0) {
-                SDL_SetRenderDrawColor(renderer, Colors::WHITE.r, Colors::WHITE.g, Colors::WHITE.b, Colors::WHITE.a);
-            } else {
-                SDL_SetRenderDrawColor(renderer, Colors::BLACK.r, Colors::BLACK.g, Colors::BLACK.b, Colors::BLACK.a);
-            }
-
-            SDL_Rect rect = {xo, yo, mapS - 1, mapS - 1};
-            SDL_RenderFillRect(renderer, &rect);
-        }
-    }
-}

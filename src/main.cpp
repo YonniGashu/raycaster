@@ -8,8 +8,8 @@
 #include "player.hpp"
 
 // Window Properties
-const int WINDOW_WIDTH = 1024;
-const int WINDOW_HEIGHT = 512;
+const int WINDOW_WIDTH = 960;
+const int WINDOW_HEIGHT = 640;
 SDL_Window *g_main_window;
 SDL_Renderer *g_main_renderer;
 
@@ -82,11 +82,9 @@ int main() {
         }
 
         ClearScreen(g_main_renderer);
-        drawMap2D(g_main_renderer);
-        player.drawPlayer(g_main_renderer);
         player.handlePlayerMovement();
-        player.drawRays2D(g_main_renderer);
         player.drawSky(g_main_renderer);
+        player.drawRays2D(g_main_renderer);
 
         SDL_RenderPresent(g_main_renderer);
     }

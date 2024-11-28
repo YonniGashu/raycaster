@@ -55,7 +55,7 @@ void drawSky(SDL_Renderer *renderer, float playerAngle) {
             int green = sky1[pixel + 1];
             int blue = sky1[pixel + 2];
             SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
-            SDL_FRect rect = {x * 8, y * 8, 8, 8};
+            SDL_FRect rect = {static_cast<float>(x * 8), static_cast<float>(y * 8), 8, 8};
             SDL_RenderFillRectF(renderer, &rect);
         }
     }

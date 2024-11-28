@@ -268,7 +268,7 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
             int green = All_Textures[pixel + 1] * shade;
             int blue = All_Textures[pixel + 2] * shade;
             SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
-            SDL_FRect rect = {r * 8, y + lineOffset, 8, 8};
+            SDL_FRect rect = {static_cast<float>(r * 8), static_cast<float>(y + lineOffset), 8, 8};
             SDL_RenderFillRectF(renderer, &rect);
             textureY += textureY_Step;
         }
@@ -289,7 +289,7 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
             int green = All_Textures[pixel + 1] * 0.7;
             int blue = All_Textures[pixel + 2] * 0.7;
             SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
-            SDL_FRect rect = {r * 8, y, 8, 8};
+            SDL_FRect rect = {static_cast<float>(r * 8), static_cast<float>(y), 8, 8};
             SDL_RenderFillRectF(renderer, &rect);
 
             // CEILINGS
@@ -300,7 +300,7 @@ void Player::drawRays2D(SDL_Renderer *renderer) {
                 green = All_Textures[pixel + 1];
                 blue = All_Textures[pixel + 2];
                 SDL_SetRenderDrawColor(renderer, red, green, blue, SDL_ALPHA_OPAQUE);
-                SDL_FRect rectC = {r * 8, 640 - y, 8, 1};
+                SDL_FRect rectC = {static_cast<float>(r * 8), static_cast<float>(640 - y), 8, 1};
                 SDL_RenderFillRectF(renderer, &rectC);
             }
         }
